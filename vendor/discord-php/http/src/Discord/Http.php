@@ -37,14 +37,14 @@ class Http
      *
      * @var string
      */
-    public const VERSION = 'v9.0.0';
+    public const VERSION = 'v8.1.2';
 
     /**
      * Current Discord HTTP API version.
      *
      * @var string
      */
-    public const HTTP_API_VERSION = 9;
+    public const HTTP_API_VERSION = 8;
 
     /**
      * Discord API base URL.
@@ -348,6 +348,7 @@ class Http
                 $error = $this->handleError($response);
                 $this->logger->warning($request.' failed: '.$error);
 
+                $deferred->reject($error);
                 $request->getDeferred()->reject($error);
             }
             // All is well
@@ -408,6 +409,7 @@ class Http
     protected function checkQueue(): void
     {
         if ($this->waiting >= static::CONCURRENT_REQUESTS || $this->queue->isEmpty()) {
+            $this->logger->debug('http not checking', ['waiting' => $this->waiting, 'empty' => $this->queue->isEmpty()]);
             return;
         }
 

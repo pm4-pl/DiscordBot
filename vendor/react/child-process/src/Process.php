@@ -245,6 +245,8 @@ class Process extends EventEmitter
 
             if ($mode === 'r+') {
                 $stream = new DuplexResourceStream($fd, $loop);
+                $stream->on('close', $streamCloseHandler);
+                $closeCount++;
             } elseif ($mode === 'w') {
                 $stream = new WritableResourceStream($fd, $loop);
             } else {
@@ -436,6 +438,10 @@ class Process extends EventEmitter
     {
         if (null !== self::$sigchild) {
             return self::$sigchild;
+        }
+
+        if (!\function_exists('phpinfo')) {
+            return self::$sigchild = false; // @codeCoverageIgnore
         }
 
         \ob_start();

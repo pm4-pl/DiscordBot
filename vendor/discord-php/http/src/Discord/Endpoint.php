@@ -60,27 +60,6 @@ class Endpoint
     public const CHANNEL_PINS = self::CHANNEL.'/pins';
     // PUT, DELETE
     public const CHANNEL_PIN = self::CHANNEL.'/pins/:message_id';
-    // POST
-    public const CHANNEL_THREADS = self::CHANNEL.'/threads';
-    // POST
-    public const CHANNEL_MESSAGE_THREADS = self::CHANNEL_MESSAGE.'/threads';
-    // GET
-    public const CHANNEL_THREADS_ACTIVE = self::CHANNEL_THREADS.'/active';
-    // GET
-    public const CHANNEL_THREADS_ARCHIVED_PUBLIC = self::CHANNEL_THREADS.'/archived/public';
-    // GET
-    public const CHANNEL_THREADS_ARCHIVED_PRIVATE = self::CHANNEL_THREADS.'/archived/private';
-    // GET
-    public const CHANNEL_THREADS_ARCHIVED_PRIVATE_ME = self::CHANNEL.'/users/@me/threads/archived/private';
-
-    // GET, PATCH, DELETE
-    public const THREAD = 'channels/:thread_id';
-    // GET
-    public const THREAD_MEMBERS = self::THREAD.'/thread-members';
-    // PUT, DELETE
-    public const THREAD_MEMBER = self::THREAD_MEMBERS.'/:user_id';
-    // PUT, DELETE
-    public const THREAD_MEMBER_ME = self::THREAD_MEMBERS.'/@me';
 
     // GET, DELETE
     public const MESSAGE_REACTION_ALL = self::CHANNEL.'/messages/:message_id/reactions';
@@ -198,7 +177,7 @@ class Endpoint
      * @see https://discord.com/developers/docs/topics/rate-limits
      * @var string[]
      */
-    public const MAJOR_PARAMETERS = ['channel_id', 'guild_id', 'webhook_id', 'thread_id'];
+    public const MAJOR_PARAMETERS = ['channel_id', 'guild_id', 'webhook_id'];
 
     /**
      * The string version of the endpoint, including all parameters.

@@ -121,12 +121,13 @@ class Bucket
     {
         // We are already checking the queue.
         if ($this->checkerRunning) {
+            $this->logger->debug($this.' already checking queue');
             return;
         }
 
         $checkQueue = function () use (&$checkQueue) {
             // Check for rate-limits
-            if ($this->requestRemaining < 1 && ! is_null($this->requestRemaining)) {
+            if ($this->requestRemaining < 1 && ! is_null($this->resetTimer)) {
                 $this->logger->info($this.' expecting rate limit, timer interval '.(($this->resetTimer->getInterval() ?? 0) * 1000).' ms');
                 $this->checkerRunning = false;
 
@@ -135,6 +136,7 @@ class Bucket
 
             // Queue is empty, job done.
             if ($this->queue->isEmpty()) {
+                $this->logger->debug($this.' queue empty');
                 $this->checkerRunning = false;
 
                 return;
@@ -142,10 +144,6 @@ class Bucket
 
             /** @var Request */
             $request = $this->queue->dequeue();
-            $request->getDeferred()->promise()->otherwise(function () use ($checkQueue) {
-                // exception happened - move on to next request
-                $checkQueue();
-            });
 
             ($this->runRequest)($request)->done(function (ResponseInterface $response) use (&$checkQueue) {
                 $resetAfter = (float) $response->getHeaderLine('X-Ratelimit-Reset-After');
@@ -178,18 +176,23 @@ class Bucket
 
                 // Check for more requests
                 $checkQueue();
-            }, function (RateLimit $rateLimit) use (&$checkQueue, $request) {
-                $this->queue->enqueue($request);
+            }, function ($rateLimit) use (&$checkQueue, $request) {
+                if ($rateLimit instanceof RateLimit) {
+                    $this->queue->enqueue($request);
 
-                // Bucket-specific rate-limit
-                // Re-queue the request and wait the retry after time
-                if (! $rateLimit->isGlobal()) {
-                    $this->loop->addTimer($rateLimit->getRetryAfter(), $checkQueue);
-                }
-                // Stop the queue checker for a global rate-limit.
-                // Will be restarted when global rate-limit finished.
-                else {
-                    $this->checkerRunning = false;
+                    // Bucket-specific rate-limit
+                    // Re-queue the request and wait the retry after time
+                    if (! $rateLimit->isGlobal()) {
+                        $this->loop->addTimer($rateLimit->getRetryAfter(), $checkQueue);
+                    }
+                    // Stop the queue checker for a global rate-limit.
+                    // Will be restarted when global rate-limit finished.
+                    else {
+                        $this->checkerRunning = false;
+                        $this->logger->debug($this.' stopping queue checker');
+                    }
+                } else {
+                    $checkQueue();
                 }
             });
         };
