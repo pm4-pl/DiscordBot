@@ -58,7 +58,7 @@ the message did not get sent, and a `ApiRejection` (exception) will be passed ba
 /** @var $api \JaxkDev\DiscordBot\Plugin\Api */
 $api = $DiscordBotPluginInstance->getApi();
 /** @var $promise \JaxkDev\DiscordBot\Libs\React\Promise\PromiseInterface */
-$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !"));
+$promise = $api->sendMessage("guild_id or null for DMs", "channel_id or user_id for DMs", "Hello world !");
 
 // You could do other things here if necessary
 // but be sure to register your callbacks before finishing.
