@@ -584,7 +584,7 @@ abstract class ModelConverter{
             ($discordEmbed->thumbnail === null || $discordEmbed->thumbnail->url === null) ? null : self::genModelEmbedImage($discordEmbed->thumbnail),
             $discordEmbed->video === null ? null : self::genModelEmbedVideo($discordEmbed->video),
             /** @phpstan-ignore-next-line Poorly documented provider object */
-            $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name, $discordEmbed->provider?->url),
+            $discordEmbed->provider === null ? null : new Provider($discordEmbed->provider?->name ?? null, $discordEmbed->provider?->url ?? null),
             ($discordEmbed->author === null || $discordEmbed->author->name === null) ? null : self::genModelEmbedAuthor($discordEmbed->author),
             $fields);
     }
